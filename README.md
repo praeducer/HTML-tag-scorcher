@@ -44,16 +44,16 @@ put all the ending tags in place.)
 
 Project Layout
 --------------
-_/data_*
+*_/data_
 
 contains test html data you should can use to test your class each filename represents 
 the iterations over time of their html code.
 
-ie: dougs_2012_02_04.html 
-    dougs_2012_04_01.html 
-    dougs_2012_07_01.html
+ie: * dougs_2012_02_04.html 
+    * dougs_2012_04_01.html 
+    * dougs_2012_07_01.html
 
-_/src_*
+*_/src_
 
 where you should put you should commit your class. 
 
