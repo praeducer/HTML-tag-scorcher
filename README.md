@@ -27,8 +27,6 @@ Code Requirements
 
 Scoring Rules
 -------------
-| *Good Tags*              | *BadTags*                |
-| :---------:              | :-------:                |
 | TagName | Score Modifier | TagName | Score Modifier |
 | ------- | :------------: | ------- | -------------- |
 | div     | 3              | font    | -1             |
