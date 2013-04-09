@@ -27,27 +27,21 @@ Code Requirements
 
 Scoring Rules
 -------------
-| TagName | Score Modifier | 
-| ------- | :------------: |
-| div     | 3              |
-| p       | 1              |
-| table   | 1              |
-| span    | 1              |
-| h1      | 3              |
-| h2      | 2              |
-| input   | 1              |
-| html    | 5              |
+| *Good Tags*              | *BadTags*                |
+| :---------:              | :-------:                |
+| TagName | Score Modifier | TagName | Score Modifier |
+| ------- | :------------: | ------- | -------------- |
+| div     | 3              | font    | -1             |
+| p       | 1              | center  | -2             |
+| table   | 1              | frame   | -5             |
+| span    | 1              | strike  | -1             |
+| h1      | 3              | big     | -2             |
+| h2      | 2              | applet  | -10            |
+| input   | 1              | frameset| -5             |
+| html    | 5              | tt      | -2             |
 | body    | 5              |
 | header  | 10             |
 | footer  | 10             |
-| font    | -1             |
-| center  | -2             |
-| frame   | -5             |
-| strike  | -1             |
-| big     | -2             |
-| applet  | -10            |
-| frameset| -5             |
-| tt      | -2             |
 
  
 
