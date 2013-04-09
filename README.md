@@ -44,7 +44,7 @@ put all the ending tags in place.)
 
 Project Layout
 --------------
-**/data
+*/data*
 
 contains test html data you should can use to test your class each filename represents 
 the iterations over time of their html code.
@@ -53,11 +53,11 @@ ie: * dougs_2012_02_04.html
     * dougs_2012_04_01.html 
     * dougs_2012_07_01.html
 
-**/src
+*/src*
 
 where you should put you should commit your class. 
 
-**/schema
+*/schema*
 
 your create table(s) statements that would setup your mysql tables.
 your query to find the average score across each key
@@ -67,7 +67,7 @@ ie:
 | dougs | 10.35    |
 | bobs  | 8.03     |
 
-**/vendor
+*/vendor*
 
 if you didn't write it put it in here and are using it put it in here.
 
