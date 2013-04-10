@@ -4,32 +4,32 @@ MarkupProject
 Info
 ----
 Create a class in the langauge of your choice that will read HTML content input and score and give 
-an arbitrary score based our set of rules. The content should be assigned a key/name so changes to the content can be reran over time
-to determine improvement/regression of the score. Each score and run should be stored in a persistant
-storage that can be used to generate some basic reporting. 
+an arbitrary score based a set of rules. The content should be assigned an unique id or name so changes to the content can be reran over time to determine improvement/regression of the score. Each unique run should be stored with the
+date and time it was run along with the score received for the content.
 
-You can use external libraries if you feel they will aid you but you must include them in your class.
+You can use external libraries if you feel they will aid you but you must place them in the appropiate folder based on the project layout section.
 
 Code Requirements
 -----------------
 * Accept HTML Content Input
 * Accept unique id/name for HTML Content to score (filename, url, supplied id)
-* Score HTML content based on score rules
-* Save results to MySQL database
-* Method: Retrieve score for a unique id
-* Method: Retrieve all content runs per date range
-* Method: Retrieve highest scored unique id
+* Score HTML content using the scoring guide
+* Save results to a MySQL database
+* Method: Retrieve scores for a unique id
+* Method: Retrieve all scores run in the system for a custom date range
+* Method: Retrieve highest scored unique id 
 * Method: Retrieve lowest scored unique id
 * Additionally you should write one query that will find the average score for all runs **__see project layout below__**
 
 ## Bonus
 * tag names are case-insensitive (ie: Html is the same as html)
-* Parses multiple sections of the HTML content at the same time 
+* Parse multiple sections of the HTML content at the same time for performance
 
 Scoring Rules
 -------------
-Only starting tags should be counted. (We will assume for this project our html code creator
-put all the ending tags in place.)
+Each starting tag should below has been assigned a score. Each tag in the content should be added/subtracted to the total score.
+
+(We will assume for this project our html code creator created valid html)
 
 | TagName | Score Modifier | TagName | Score Modifier |
 | ------- | :------------: | ------- | -------------- |
@@ -42,12 +42,33 @@ put all the ending tags in place.)
 | header  | 10             | frame   | -5             |
 | footer  | 10             |
 
+example:
+
+````
+<html>
+    <body>
+      <p>foo</p>
+      <p>bar</p>
+      <div text-align='center'>
+        <big>hello world</big>
+      </div>
+    </body>
+</html>
+````
+
+2 p tags = 2 x 1 <br>
+1 body tag = 1 x 5 <br> 
+1 html tag = 1 x 5 <br>
+1 div tag = 1 x 3 <br>
+1 big tag = 1 x -2 <br>
+**Total Score: 13**
+
+
 Project Layout
 --------------
 ####/data
 
-contains test html data you should can use to test your class each filename represents 
-the iterations over time of their html code.
+* Contains the HTML content data to parse, format: (keyname_yyyy_mm_dd)
 
 ie: 
 * dougs_2012_02_04.html 
@@ -56,12 +77,12 @@ ie:
 
 ####/src
 
-where you should put you should commit your class. 
+* Your code goes in here.
 
 ####/schema
 
-your create table(s) statements that would setup your mysql tables.
-your query to find the average score across each key
+* Your create table statements for MySQL. 
+* Your query to find the average score across each key. (see data example below)
 
 ie: 
 
@@ -72,7 +93,7 @@ bobs  | 8.03
 
 ####/vendor
 
-if you didn't write it put it in here and are using it put it in here.
+* If you didn't write it put it in here and are using it put it in here.
 
 Instructions
 ------------
