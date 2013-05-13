@@ -97,5 +97,8 @@ bobs  | 8.03
 
 Instructions
 ------------
+* Fork this repo into your own github account.  
+* Begin working on the project and commit your code to the repo
+* When you are finished. Email your RedVentures recruiter or submit a pull request on the project. 
 
 
