@@ -4,7 +4,8 @@ MarkupProject
 Info
 ----
 Create a class in the langauge of your choice that will read HTML content input and score and give 
-an arbitrary score based on a set of rules. The content should be assigned a unique id or name so changes to the content can be re-ran over time to determine improvement/regression of the score. Each unique run should be stored with the
+an arbitrary score based on a set of rules. The content should be assigned a unique id based on the prefix described below. 
+Changes to the content can be re-ran over time to determine improvement/regression of the score. Each unique run should be stored with the
 date and time it was ran along with the score received for the content.
 
 You can use external libraries if you feel they will aid you but you must place them in the appropiate folder based on the project layout section.
@@ -12,7 +13,7 @@ You can use external libraries if you feel they will aid you but you must place 
 Code Requirements
 -----------------
 * Accept HTML Content Input
-* Accept unique id/name for HTML Content to score (filename, url, supplied id)
+* Accept unique id for HTML Content to score (filename prefix)
 * Score HTML content using the scoring guide
 * Save results to a MySQL database
 * Method: Retrieve scores for a unique id
