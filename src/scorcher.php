@@ -1,11 +1,10 @@
 <?php
 class Scorcher
 	{
-
+		
 		// Configuraiton
-		date_default_timezone_set('UTC'); // set the default timezone to use. Available since PHP 5.1
-		private const string $DEFAULTDATE = COOKIE; // Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
-		private static $DEFAULTRULESARRAY = array(
+		//date_default_timezone_set('UTC'); // set the default timezone to use. Available since PHP 5.1
+ 		private $DEFAULTRULESARRAY = array(
 		    "div" => 3,
 		    "p" => 1,
 		    "h1" => 3,
@@ -22,7 +21,7 @@ class Scorcher
 		    "frameset" => -5,
 		    "frame" => -5,
 		); // The default set of rules from the project definition
-
+		
 	    // Properties (default values set)
 	    private $contentId; // String: Unique ID for the content. Format: (keyname_yyyy_mm_dd)
 	    private $contentPath; // String: URL or Directory Path to content
@@ -31,23 +30,36 @@ class Scorcher
 	    private $rulesArray; // An array that will store tag names as keys and the Score Modifier as the value
 	    private $scorecardArray; // An array that will store tag names as keys and the accumulated score given for each Score Modifier
 	    private $totalScore; // Integer: This will store the cumulative score. It will be a sum of all values from $scorecardArray
-
+	    
 	    // Constructors
 	    public function __construct() {
-	       	$this->$contentId = '';
-		    $this->$contentPath = '';
-		    $this->$date = date($DATE);
-		    $this->$tagCountArray = array();
-		    $this->$rulesArray = $DEFAULTRULESARRAY;
-		    $this->$scorecardArray = array();
-		    $this->$totalScore = 0;
+
+	       	$this->contentId = '';
+		    $this->contentPath = '';
+		    $this->date = date(DATE_COOKIE); // Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
+		    $this->tagCountArray = array();
+		    $this->rulesArray = $this->DEFAULTRULESARRAY;
+		    $this->scorecardArray = array();
+		    $this->totalScore = 0;
+	    		    
 	    }
 
 	    // Methods
+	    /**
+		 * Prints out the object's properties. 
+		 */
 	    public function displayVar() {
-	        echo $this->var;
+	       	echo $this->contentId;
+		    echo $this->contentPath;
+		    echo $this->date;
+		    print_r($this->tagCountArray);
+		    print_r($this->rulesArray);
+		    print_r($this->scorecardArray);
+		    echo $this->totalScore;
 	    }
-
+	    public function helloWorld(){
+	    	echo "Hello World!";
+	    }
 	    // Setters
 
 
@@ -55,4 +67,5 @@ class Scorcher
 	    
 
 	}
+
 ?>
