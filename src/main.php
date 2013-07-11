@@ -8,11 +8,11 @@
 
         <?php
             require_once("scorcher.php");
-            Scorcher::helloWorld();
-            echo "<br>";
-            $scorch = new Scorcher();
+            //Scorcher::helloWorld();
+            $test = "paul_1986_02_03";
+            $scorch = new Scorcher($test);
             $scorch->displayVar();
-            echo "after";
+            //Scorcher::helloWorld();
         ?>
 
 </body>

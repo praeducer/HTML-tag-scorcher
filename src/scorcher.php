@@ -25,18 +25,39 @@ class Scorcher
 	    // Properties (default values set)
 	    private $contentId; // String: Unique ID for the content. Format: (keyname_yyyy_mm_dd)
 	    private $contentPath; // String: URL or Directory Path to content
-	    private $date; // Date and time of the last run. Defaults to date and time property is instantiated
+	    private $dateRan; // Date and time of the last run. date(DATE_COOKIE) Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
 	    private $tagCountArray; // An array that will store tag names as keys and the instance count as the value
 	    private $rulesArray; // An array that will store tag names as keys and the Score Modifier as the value
 	    private $scorecardArray; // An array that will store tag names as keys and the accumulated score given for each Score Modifier
 	    private $totalScore; // Integer: This will store the cumulative score. It will be a sum of all values from $scorecardArray
-	    
+
 	    // Constructors
+	    /** Oops! Can't overload in PHP (easily).
+		 * Default. Uses default set of rules. Will do nothing if ran as is.
+		 
 	    public function __construct() {
 
 	       	$this->contentId = '';
 		    $this->contentPath = '';
-		    $this->date = date(DATE_COOKIE); // Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
+		    $this->dateRan = ''; 
+		    $this->tagCountArray = array();
+		    $this->rulesArray = $this->DEFAULTRULESARRAY;
+		    $this->scorecardArray = array();
+		    $this->totalScore = 0;
+	    		    
+	    }
+	    */
+	    /**
+		 * 
+		 * Build an object instance given a unique ID. Uses default rule set.
+		 *
+		 * @param string $newContentId the content ID for the content that needs to be parsed
+		 */
+	    public function __construct($newContentId) {
+
+	       	$this->contentId = $newContentId;
+		    $this->contentPath = '../data/' . $newContentId . '.html';
+		    $this->dateRan = '';
 		    $this->tagCountArray = array();
 		    $this->rulesArray = $this->DEFAULTRULESARRAY;
 		    $this->scorecardArray = array();
@@ -49,13 +70,16 @@ class Scorcher
 		 * Prints out the object's properties. 
 		 */
 	    public function displayVar() {
-	       	echo $this->contentId;
-		    echo $this->contentPath;
-		    echo $this->date;
+	       	echo 'contentId: ' . $this->contentId;
+		    echo '<br>' . 'contentPath: ' . $this->contentPath;
+		    echo '<br>' . 'date: ' . $this->date;
+		    echo '<br>' . 'tagCountArray: ';
 		    print_r($this->tagCountArray);
+		    echo '<br> rulesArray: ';
 		    print_r($this->rulesArray);
+		    echo '<br> scorecardArray: ';
 		    print_r($this->scorecardArray);
-		    echo $this->totalScore;
+		    echo '<br> totalScore: ' . $this->totalScore . '<br>';
 	    }
 	    public function helloWorld(){
 	    	echo "Hello World!";
