@@ -3,7 +3,6 @@ class Scorcher
 	{
 		
 		// Configuraiton
-		//date_default_timezone_set('UTC'); // set the default timezone to use. Available since PHP 5.1
  		private $DEFAULTRULESARRAY = array(
 			"div" => 3,
 			"p" => 1,
@@ -21,7 +20,6 @@ class Scorcher
 			"frameset" => -5,
 			"frame" => -5,
 		); // The default set of rules from the project definition
-
 		private $dbServer = "localhost"; // server hosting the MySql database
 		private $dbUser = "root"; // user name to login to database
 		private $dbPass = ""; // A really safe way to secure the database
@@ -32,7 +30,7 @@ class Scorcher
 		// Properties (default values set)
 		private $contentId; // String: Unique ID for the content. Format: (keyname_yyyy_mm_dd)
 		private $contentPath; // String: URL or Directory Path to content
-		//private $dateRan; // Date and time of the last run. date(DATE_COOKIE) Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
+		private $contentDirectory; // Parent directory of content. Used for scoring entire folders.
 		private $tagCountArray; // An array that will store tag names as keys and the instance count as the value
 		private $rulesArray; // An array that will store tag names as keys and the Score Modifier as the value
 		private $scorecardArray; // An array that will store tag names as keys and the accumulated score given for each Score Modifier
@@ -43,17 +41,10 @@ class Scorcher
 		 * 
 		 * Build an object instance given a unique ID. Uses default rule set.
 		 *
-		 * @param string $newContentId the content ID for the content that needs to be parsed
+		 * 
 		 */
-		public function __construct($newContentId) {
-
-			$this->contentId = $newContentId;
-			$this->contentPath = '../data/' . $newContentId . '.html';
-			//$this->dateRan = '';
-			$this->tagCountArray = array();
-			$this->rulesArray = $this->DEFAULTRULESARRAY;
-			$this->scorecardArray = array();
-			$this->totalScore = 0;
+		public function __construct() {
+			$this->resetVars();
 			$this->databaseConnect();
 					
 		}
@@ -62,6 +53,62 @@ class Scorcher
 		}
 
 		// Methods
+		/**
+		 * 
+		 * Score content. Map the rules to the amount of each tag. Multiply them by eachother.
+		 *
+		 * @param string $path Directory to the content that needs to be parsed.
+		 */
+		public function scorch($path) {
+
+			$this->setPathVars($path);
+			$this->countTags();
+			// Get all of the keys from the rules array
+			$keyArray = array_keys($this->rulesArray);
+			for( $i = 0 ; $i < count($keyArray); $i++){
+				// If the tag for the rule exists in the content
+				if(array_key_exists($keyArray[$i], $this->tagCountArray)){
+					// Multiple the score modifier by the number of tag instances. Accumulate total score.
+					$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
+						($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
+				}
+			}
+
+			$this->saveScorch();
+
+		}
+		// Methods
+		/**
+		 * 
+		 * Reset all properties to default values.
+		 *
+		 */
+		public function resetVars() {
+			$this->contentId = '';
+			$this->contentPath = '';
+			$this->contentDirectory = '';
+			$this->tagCountArray = array();
+			$this->rulesArray = $this->DEFAULTRULESARRAY;
+			$this->scorecardArray = array();
+			$this->totalScore = 0;
+		}
+		/**
+		 * 
+		 * Score all content in a directory. Map the rules to the amount of each tag. Multiply them by eachother.
+		 *
+		 * @param string $directory Directory to the content that needs to be parsed. Format must include slash at the beginning and end.
+		 */
+		public function scorchDirectory($directory) {
+			$files = scandir($directory);
+			foreach ($files as $file) {
+				if(!is_dir($file)){
+					$this->scorch($directory . $file);
+					$this->resetVars();
+				}
+			}
+
+
+		}		
 		/**
 		 * 
 		 * Count how many times each tag is in the content. Store each tag count individually.
@@ -85,24 +132,14 @@ class Scorcher
 
 		/**
 		 * 
-		 * Map the rules to the amount of each tag. Multiply them by eachother.
+		 * Break path into useful parts.
 		 *
 		 */
-		public function scorch() {
-			$this->countTags();
-			//Get all of the keys from the rules array
-			$keyArray = array_keys($this->rulesArray);
-			for( $i = 0 ; $i < count($keyArray); $i++){
-				// If the tag for the rule exists in the content
-				if(array_key_exists($keyArray[$i], $this->tagCountArray)){
-					// Multiple the score modifier by the number of tag instances. Accumulate total score.
-					$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
-						($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
-				}
-			}
-
-			$this->saveScorch();
-
+		public function setPathVars($path) {
+			$pathParts = pathinfo($path);
+			$this->contentPath = $path;
+			$this->contentDirectory = $pathParts['dirname'];
+			$this->contentId = $pathParts['filename'];
 		}
 
 		//Database access methods
@@ -117,8 +154,6 @@ class Scorcher
 				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
 			}else { echo "MySQL connection successful.<br />\n"; }			
 		}
-
-
 		/**
 		 * 
 		 * Save the relevant information to the current run to the database
@@ -130,14 +165,18 @@ class Scorcher
 				VALUES ('$this->contentId', '$this->totalScore')")){
 				die('Error: ' . mysqli_error($this->mysqli));
 			} echo "New run added for $this->contentId with a score of $this->totalScore.";
+		}
+		/**
+		 * 
+		 * Save the relevant information to the current run to the database
+		 *
+		 */
+		public function retrieveScores($uniqueId) {
+
 
 
 		}
 
-		// Setters
-
-		// Getters
-		
 		// Printers
 		/**
 		 * Prints out the object's properties. 
@@ -146,7 +185,7 @@ class Scorcher
 			echo "<br />\n";
 			$this->displayVar("contentId", $this->contentId);
 			$this->displayVar("contentPath", $this->contentPath);
-			//$this->displayVar("dateRan", $this->dateRan);
+			$this->displayVar("contentDirectory", $this->contentDirectory);
 			$this->displayVarray("tagCountArray", $this->tagCountArray);
 			$this->displayVarray("rulesArray", $this->rulesArray);
 			$this->displayVarray("scorecardArray", $this->scorecardArray);

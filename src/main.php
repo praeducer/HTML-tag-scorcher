@@ -10,9 +10,10 @@
             
             require_once("scorcher.php");
             Scorcher::helloWorld("!");
-            $test = "paul_1986_02_03";
-            $scorcher = new Scorcher($test);
-            $scorcher->scorch();
+            $content = "../data/paul_1986_02_03.html";
+            $directory = "../data/";
+            $scorcher = new Scorcher();
+            $scorcher->scorchDirectory($directory);
             $scorcher->displayVars();
             Scorcher::goodbyeWorld("...");
 
