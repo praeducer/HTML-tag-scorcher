@@ -57,6 +57,9 @@ class Scorcher
 			$this->databaseConnect();
 					
 		}
+		public function __destruct() {
+			mysqli_close($this->mysqli);
+		}
 
 		// Methods
 		/**
@@ -68,7 +71,9 @@ class Scorcher
 
 			$content = new DOMDocument();
 			$content->loadHTMLFile($this->contentPath);
+			// Create an array with all tags that exist in content.
 			$tags = $content->getElementsByTagName('*');
+			// Count the occurence of each tag.
 			foreach($tags as $tag) {
 				if(array_key_exists($tag->tagName, $this->tagCountArray)) {
 					$this->tagCountArray[$tag->tagName] += 1;
@@ -88,10 +93,15 @@ class Scorcher
 			//Get all of the keys from the rules array
 			$keyArray = array_keys($this->rulesArray);
 			for( $i = 0 ; $i < count($keyArray); $i++){
-				
-				$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
-					($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
+				// If the tag for the rule exists in the content
+				if(array_key_exists($keyArray[$i], $this->tagCountArray)){
+					// Multiple the score modifier by the number of tag instances. Accumulate total score.
+					$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
+						($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
+				}
 			}
+
+			$this->saveScorch();
 
 		}
 
@@ -102,8 +112,8 @@ class Scorcher
 		 *
 		 */
 		public function databaseConnect() {
-			$mysqli = mysqli_connect($dbServer, $dbUser, $dbPass, $db);
-			if (mysqli_connect_errno($mysqli)) {
+			$this->mysqli = mysqli_connect($this->dbServer, $this->dbUser, $this->dbPass, $this->db);
+			if (mysqli_connect_errno($this->mysqli)) {
 				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
 			}else { echo "MySQL connection successful.<br />\n"; }			
 		}
@@ -116,6 +126,10 @@ class Scorcher
 		 */
 		public function saveScorch() {
 
+			if(!mysqli_query($this->mysqli, "INSERT INTO runs (content_id, score)
+				VALUES ('$this->contentId', '$this->totalScore')")){
+				die('Error: ' . mysqli_error($this->mysqli));
+			} echo "New run added for $this->contentId with a score of $this->totalScore.";
 
 
 		}
