@@ -67,28 +67,60 @@ class Scorcher
 
 	    // Methods
 	    /**
-		 * Prints out the object's properties. 
+		 * 
+		 * Count how many times each tag is in the content. Store each tag count individually.
+		 *
 		 */
-	    public function displayVar() {
-	       	echo 'contentId: ' . $this->contentId;
-		    echo '<br>' . 'contentPath: ' . $this->contentPath;
-		    echo '<br>' . 'date: ' . $this->date;
-		    echo '<br>' . 'tagCountArray: ';
-		    print_r($this->tagCountArray);
-		    echo '<br> rulesArray: ';
-		    print_r($this->rulesArray);
-		    echo '<br> scorecardArray: ';
-		    print_r($this->scorecardArray);
-		    echo '<br> totalScore: ' . $this->totalScore . '<br>';
+	    public function countTags() {
+
+	    	$content = new DOMDocument();
+			$content->loadHTMLFile($this->contentPath);
+			$tags = $content->getElementsByTagName('*');
+			foreach($tags as $tag) {
+			    if(array_key_exists($tag->tagName, $this->tagCountArray)) {
+			        $this->tagCountArray[$tag->tagName] += 1;
+			    } else {
+			        $this->tagCountArray[$tag->tagName] = 1;
+			    }
+			}
 	    }
-	    public function helloWorld(){
-	    	echo "Hello World!";
-	    }
+
+	    
+
 	    // Setters
 
 
 	    // Getters
 	    
+	    // Printers
+	    /**
+		 * Prints out the object's properties. 
+		 */
+	    public function displayVars() {
+	    	
+	    	Scorcher::displayVar("contentId", $this->contentId);
+			Scorcher::displayVar("contentPath", $this->contentPath);
+		    Scorcher::displayVar("dateRan", $this->dateRan);
+		   	Scorcher::displayVarray("tagCountArray", $this->tagCountArray);
+		    Scorcher::displayVarray("rulesArray", $this->rulesArray);
+		   	Scorcher::displayVarray("scorecardArray", $this->scorecardArray);
+		   	Scorcher::displayVar("totalScore", $this->totalScore);
+	    }
+
+	    public function displayVar($name, $var){
+	    	echo "<b>" . $name . "</b>"  .":	" . $var . "<br>";
+	    }
+
+	    public function displayVarray($name, $arrayOK){
+	    	echo "<b>" . $name . "</b>" . ":	" . "<br>";
+	    	foreach ($arrayOK as $key => $value) {
+	    		echo "<b>|</b> Key: $key <b>=></b> Value: $value <br />\n";
+	    	}
+	    }
+
+	    public function helloWorld($w){
+	    	echo "Hello, World$w<br />\n";
+	    }
 
 	}
 

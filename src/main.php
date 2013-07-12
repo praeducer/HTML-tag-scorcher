@@ -7,12 +7,14 @@
 <body>
 
         <?php
+            
             require_once("scorcher.php");
-            //Scorcher::helloWorld();
+            Scorcher::helloWorld("!");
             $test = "paul_1986_02_03";
             $scorch = new Scorcher($test);
-            $scorch->displayVar();
-            //Scorcher::helloWorld();
+            $scorch->countTags();
+            $scorch->displayVars();
+            Scorcher::helloWorld("?");
         ?>
 
 </body>
