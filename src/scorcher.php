@@ -21,11 +21,18 @@ class Scorcher
 			"frameset" => -5,
 			"frame" => -5,
 		); // The default set of rules from the project definition
-		
+
+		private $dbServer = "localhost"; // server hosting the MySql database
+		private $dbUser = "root"; // user name to login to database
+		private $dbPass = ""; // A really safe way to secure the database
+		private $db = "scorcher"; // name of the database that holds all of the runs
+		private $mysqli;
+
+
 		// Properties (default values set)
 		private $contentId; // String: Unique ID for the content. Format: (keyname_yyyy_mm_dd)
 		private $contentPath; // String: URL or Directory Path to content
-		private $dateRan; // Date and time of the last run. date(DATE_COOKIE) Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
+		//private $dateRan; // Date and time of the last run. date(DATE_COOKIE) Predefined Constant for date format: Default HTTP Cookies (example: Monday, 15-Aug-05 15:52:01 UTC)
 		private $tagCountArray; // An array that will store tag names as keys and the instance count as the value
 		private $rulesArray; // An array that will store tag names as keys and the Score Modifier as the value
 		private $scorecardArray; // An array that will store tag names as keys and the accumulated score given for each Score Modifier
@@ -42,11 +49,12 @@ class Scorcher
 
 			$this->contentId = $newContentId;
 			$this->contentPath = '../data/' . $newContentId . '.html';
-			$this->dateRan = '';
+			//$this->dateRan = '';
 			$this->tagCountArray = array();
 			$this->rulesArray = $this->DEFAULTRULESARRAY;
 			$this->scorecardArray = array();
 			$this->totalScore = 0;
+			$this->databaseConnect();
 					
 		}
 
@@ -69,10 +77,10 @@ class Scorcher
 				}
 			}
 		}
-		
+
 		/**
 		 * 
-		 * Map the rules to the amount of tagsn and multiply them
+		 * Map the rules to the amount of each tag. Multiply them by eachother.
 		 *
 		 */
 		public function scorch() {
@@ -87,6 +95,31 @@ class Scorcher
 
 		}
 
+		//Database access methods
+		/**
+		 * 
+		 * Save the relevant information to the current run to the database
+		 *
+		 */
+		public function databaseConnect() {
+			$mysqli = mysqli_connect($dbServer, $dbUser, $dbPass, $db);
+			if (mysqli_connect_errno($mysqli)) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
+			}else { echo "MySQL connection successful.<br />\n"; }			
+		}
+
+
+		/**
+		 * 
+		 * Save the relevant information to the current run to the database
+		 *
+		 */
+		public function saveScorch() {
+
+
+
+		}
+
 		// Setters
 
 		// Getters
@@ -96,29 +129,33 @@ class Scorcher
 		 * Prints out the object's properties. 
 		 */
 		public function displayVars() {
-			
-			Scorcher::displayVar("contentId", $this->contentId);
-			Scorcher::displayVar("contentPath", $this->contentPath);
-			Scorcher::displayVar("dateRan", $this->dateRan);
-			Scorcher::displayVarray("tagCountArray", $this->tagCountArray);
-			Scorcher::displayVarray("rulesArray", $this->rulesArray);
-			Scorcher::displayVarray("scorecardArray", $this->scorecardArray);
-			Scorcher::displayVar("totalScore", $this->totalScore);
+			echo "<br />\n";
+			$this->displayVar("contentId", $this->contentId);
+			$this->displayVar("contentPath", $this->contentPath);
+			//$this->displayVar("dateRan", $this->dateRan);
+			$this->displayVarray("tagCountArray", $this->tagCountArray);
+			$this->displayVarray("rulesArray", $this->rulesArray);
+			$this->displayVarray("scorecardArray", $this->scorecardArray);
+			$this->displayVar("totalScore", $this->totalScore);
 		}
 
 		public function displayVar($name, $var){
-			echo "<b>" . $name . "</b>"  .":	" . $var . "<br>";
+			echo "<b>" . $name . "</b>"  .":	" . $var . "<br />\n";
 		}
 
 		public function displayVarray($name, $arrayOK){
-			echo "<b>" . $name . "</b>" . ":	" . "<br>";
+			echo "<b>" . $name . "</b>" . ":	" . "<br />\n";
 			foreach ($arrayOK as $key => $value) {
 				echo "<b>|</b> Key: $key <b>=></b> Value: $value <br />\n";
 			}
 		}
 
 		public function helloWorld($w){
-			echo "Hello, World$w<br />\n";
+			echo "Hello, World$w<br />\n<br />\n";
+		}
+
+		public function goodbyeWorld($w){
+			echo "<br />\nGoodbye, World$w<br />\n";
 		}
 
 	}

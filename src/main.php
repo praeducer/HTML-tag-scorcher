@@ -14,8 +14,8 @@
             $scorcher = new Scorcher($test);
             $scorcher->scorch();
             $scorcher->displayVars();
-            Scorcher::helloWorld("?");
-            
+            Scorcher::goodbyeWorld("...");
+
         ?>
 
 </body>
