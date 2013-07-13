@@ -12,9 +12,12 @@
             Scorcher::helloWorld("!");
             $content = "../data/paul_1986_02_03.html";
             $directory = "../data/";
-            $scorcher = new Scorcher();
-            $scorcher->scorchDirectory($directory);
-            $scorcher->displayVars();
+            Scorcher::buildDatabase();
+            //$scorcher = new Scorcher();
+            //$scorcher->prepareMySQL();
+            //$scorcher->scorch($content);
+            //$scorcher->scorchDirectory($directory);
+            //$scorcher->displayVars();
             Scorcher::goodbyeWorld("...");
 
         ?>
