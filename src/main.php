@@ -10,9 +10,9 @@
             
             require_once("scorcher.php");
             Scorcher::helloWorld("!");
+            Scorcher::buildDatabase();
             $content = "../data/paul_1986_02_03.html";
             $directory = "../data/";
-            Scorcher::buildDatabase();
             //$scorcher = new Scorcher();
             //$scorcher->prepareMySQL();
             //$scorcher->scorch($content);

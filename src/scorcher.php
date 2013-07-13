@@ -19,11 +19,11 @@ class Scorcher
 			"frameset" => -5,
 			"frame" => -5,
 		); // The default set of rules from the project definition
-		private constant $DBSERVER = "localhost"; // server hosting the MySql database
-		private constant $DBUSER = "root"; // user name to login to database
-		private constant $DBPASS = ""; // A really safe way to secure the database
-		private constant $DB = "scorcher"; // name of the database that holds all of the runs
-		private constant $DBTABLE = "runs";
+		const DBSERVER = "localhost"; // server hosting the MySql database
+		const DBUSER = "root"; // user name to login to database
+		const DBPASS = ""; // A really safe way to secure the database
+		const DB = "scorcher"; // name of the database that holds all of the runs
+		const DBTABLE = "runs";
 		private $mysqli; // Connection to MySQL
 
 		// Properties
@@ -174,9 +174,9 @@ class Scorcher
 			{
 				echo "Failed to connect to MySQL: " . mysqli_connect_error();
 			}
-			$createDatabaseQuery = "CREATE DATABASE 'Scorcher::DB'";//!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
+			$createDatabaseQuery = "CREATE DATABASE " . Scorcher::DB;//!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 			if (mysqli_query($localMysqli,$createDatabaseQuery)){
-				echo "Database 'Scorcher::DB' created successfully<br />\n";
+				echo "Database " . Scorcher::DB . " created successfully<br />\n";
 			}else{
 				echo "Error creating database: " . mysqli_error($localMysqli) . "<br />\n";
 			}
@@ -193,7 +193,7 @@ class Scorcher
 				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
 			}else { echo "MySQL connection successful.<br />\n"; }
 			$createTableQuery = 
-				"CREATE TABLE 'Scorcher::DBTABLE' (
+				"CREATE TABLE " . Scorcher::DBTABLE . " (
 					run_id int(11) NOT NULL AUTO_INCREMENT,
 					run_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					content_unique_id varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -203,7 +203,7 @@ class Scorcher
 					UNIQUE KEY run_id (run_id)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 			if (mysqli_query($localMysqli, $createTableQuery)){
-				echo "Table 'Scorcher::DBTABLE' created successfully<br />\n";
+				echo "Table " . Scorcher::DBTABLE . " created successfully<br />\n";
 			}else{
 				echo "Error creating table: " . mysqli_error($localMysqli) . "<br />\n";
 			}
@@ -218,7 +218,7 @@ class Scorcher
 			$contentDate = $this->contentDate->format('Y-m-d');
 			if(!mysqli_query($this->mysqli, "INSERT INTO '$this->DBTABLE' (content_unique_id, content_date, score)
 				VALUES ('$this->uniqueId', '$contentDate', '$this->totalScore')")){
-				die('Error: ' . mysqli_error($this->mysqli) . <br />\n);
+				die('Error: ' . mysqli_error($this->mysqli) . "<br />\n");
 			} echo "New run added for '$this->contentId' with a score of '$this->totalScore'.<br />\n";
 		}
 		/**
