@@ -28,7 +28,8 @@
             
             //DATABASE METHODS
             //Scorcher::retrieveScores('bob');
-            Scorcher::retrieveDateRange('2013_02_01','2013_03_01');
+            //Scorcher::retrieveDateRange('2013_02_01','2013_03_01');
+            Scorcher::retrieveHighest();
             // Let 'em know we're done for now.
             Scorcher::goodbyeWorld("...");
 

@@ -240,13 +240,9 @@ class Scorcher
 			);
 			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
 			echo "'$key' content retrieved: <br />\n";
-			while($row = mysqli_fetch_array($result)) {
-				echo "\tOn " . $row['content_date'] . " the keyname '$key' scored '" . $row['score'] .
-					"' according to the run with a timestamp of '" . $row['run_timestamp'] . "'.<br />\n";
-			}
+			Scorcher::printRows($result);
 			mysqli_close($localMysqli);
 		}
-
 		/**
 		 * 
 		 * "Method: Retrieve all scores run in the system for a custom date range"
@@ -269,13 +265,35 @@ class Scorcher
 			);
 			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
 			echo "Date range retrieved: <br />\n";
-			while($row = mysqli_fetch_array($result)) {
-				echo "\tOn " . $row['content_date'] . " the keyname '" . $row['keyname'] . "' scored '" . $row['score'] .
-					"' according to the run with a timestamp of '" . $row['run_timestamp'] . "'.<br />\n";
-			}
+			Scorcher::printRows($result);
 			mysqli_close($localMysqli);
 		}
-
+		/**
+		 * 
+		 * "Method: Retrieve highest scored unique id"
+		 *
+		 */
+		public function retrieveHighest() {
+			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
+			if (mysqli_connect_errno($localMysqli)) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
+			}
+			$result = mysqli_query($localMysqli,
+				"SELECT MAX(score) AS max
+				FROM " . Scorcher::DBTABLE
+			);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			$max = mysqli_fetch_array($result)['max'];
+			$result = mysqli_query($localMysqli,
+				"SELECT run_timestamp, keyname, content_date, score
+				FROM " . Scorcher::DBTABLE . "
+				WHERE score = $max"
+			);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			echo "Highest scored Unique ID retrieved: <br />\n";
+			Scorcher::printRows($result);
+			mysqli_close($localMysqli);
+		}
 
 
 		// Printers
@@ -303,6 +321,13 @@ class Scorcher
 			echo "<b>" . $name . "</b>" . ":	" . "<br />\n";
 			foreach ($arrayOK as $key => $value) {
 				echo "<b>|</b> Key: $key <b>=></b> Value: $value <br />\n";
+			}
+		}
+
+		private function printRows($result){
+			while($row = mysqli_fetch_array($result)) {
+				echo "\tOn " . $row['content_date'] . " the keyname '" . $row['keyname'] . "' scored '" . $row['score'] .
+					"' according to the run with a timestamp of '" . $row['run_timestamp'] . "'.<br />\n";
 			}
 		}
 
