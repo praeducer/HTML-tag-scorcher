@@ -9,15 +9,27 @@
         <?php
             
             require_once("scorcher.php");
+            // Test that class was loaded...
             Scorcher::helloWorld("!");
-            Scorcher::buildDatabase();
-            $content = "../data/paul_1986_02_03.html";
-            $directory = "../data/";
+            // Build out the database and table if you have not already.
+            //Scorcher::buildDatabase();
+
+            // MAIN CLASS METHODS
+            //$content = "../data/paul_1986_02_03.html";
+            //$directory = "../data/";
+            // Oh yeah, instantiate the masterpiece. 
             //$scorcher = new Scorcher();
-            //$scorcher->prepareMySQL();
+            // Score only one piece of content and save it to the database.
             //$scorcher->scorch($content);
+            // Score all content in the directory and save all of the results to the database.
             //$scorcher->scorchDirectory($directory);
+            // See what's in the current object.
             //$scorcher->displayVars();
+            
+            //DATABASE METHODS
+            Scorcher::retrieveScores('bob');
+
+            // Let 'em know we're done for now.
             Scorcher::goodbyeWorld("...");
 
         ?>
