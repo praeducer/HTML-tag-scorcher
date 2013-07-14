@@ -29,7 +29,9 @@
             //DATABASE METHODS
             //Scorcher::retrieveScores('bob');
             //Scorcher::retrieveDateRange('2013_02_01','2013_03_01');
-            Scorcher::retrieveHighest();
+            //Scorcher::retrieveHighest();
+            //Scorcher::retrieveLowest();
+            Scorcher::retrieveAvgPerKey();
             // Let 'em know we're done for now.
             Scorcher::goodbyeWorld("...");
 

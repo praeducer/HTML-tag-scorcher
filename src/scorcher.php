@@ -1,4 +1,10 @@
 <?php
+/**
+ *
+ * "Create a class in the langauge of your choice that will read HTML content input and
+ * score and give an arbitrary score based on a set of rules."
+ *
+ */
 class Scorcher
 	{	
 		// Configuraiton
@@ -41,7 +47,6 @@ class Scorcher
 		/**
 		 * 
 		 * Build an object instance given a unique ID. Uses default rule set.
-		 *
 		 * 
 		 */
 		public function __construct() {
@@ -73,6 +78,11 @@ class Scorcher
 		/**
 		 * 
 		 * Score content. Map the rules to the amount of each tag. Multiply them by eachother.
+		 * "Changes to the content can be re-ran over time to determine improvement/regression of the score."
+		 * "Accept HTML Content Input"
+		 * "Score HTML content using the scoring guide"
+		 * "Each starting tag should been assigned a score."
+		 * "Each tag in the content should be added/subtracted to the total score."
 		 *
 		 * @param string $path Full working directory to the content that needs to be parsed. Can be relative to the location of this file.
 		 */
@@ -124,6 +134,7 @@ class Scorcher
 		/**
 		 * 
 		 * Count how many times each tag is in the content. Store each tag count individually.
+		 * "Accept HTML Content Input"
 		 *
 		 */
 		private function countTags() {
@@ -212,7 +223,9 @@ class Scorcher
 		/**
 		 * 
 		 * Save the relevant information to the current run to the database
-		 *
+		 * "Each unique run should be stored with the date and time it was ran along with the score received for the content."
+		 * "Save results to a MySQL database"
+		 * 
 		 */
 		private function saveScorch() {
 			$contentDate = $this->contentDate->format('Y-m-d');
@@ -294,7 +307,56 @@ class Scorcher
 			Scorcher::printRows($result);
 			mysqli_close($localMysqli);
 		}
-
+		/**
+		 * 
+		 * "Method: Retrieve lowest scored unique id"
+		 *
+		 */
+		public function retrieveLowest() {
+			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
+			if (mysqli_connect_errno($localMysqli)) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
+			}
+			$result = mysqli_query($localMysqli,
+				"SELECT MIN(score) AS min
+				FROM " . Scorcher::DBTABLE
+			);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			$min = mysqli_fetch_array($result)['min'];
+			$result = mysqli_query($localMysqli,
+				"SELECT run_timestamp, keyname, content_date, score
+				FROM " . Scorcher::DBTABLE . "
+				WHERE score = $min"
+			);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			echo "Highest scored Unique ID retrieved: <br />\n";
+			Scorcher::printRows($result);
+			mysqli_close($localMysqli);
+		}
+		/**
+		 * 
+		 * Method containing "one query that will find the average score for all runs"
+		 * i.e. "query to find the average score across each key"
+		 *
+		 */
+		public function retrieveAvgPerKey() {
+			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
+			if (mysqli_connect_errno($localMysqli)) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
+			}
+			$result = mysqli_query($localMysqli,
+				"SELECT keyname, AVG(score)
+				FROM " . Scorcher::DBTABLE . "
+				GROUP BY keyname"
+			);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			echo "Average scores across each key:<br />\n";
+			while($row = mysqli_fetch_array($result)){
+				echo "\tThe average score of '". $row['keyname']. "' is '". round($row['AVG(score)'], 2) . "'.";
+				echo "<br />";
+			}
+			mysqli_close($localMysqli);
+		}
 
 		// Printers
 		/**
