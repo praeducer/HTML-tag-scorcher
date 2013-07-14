@@ -3,9 +3,8 @@
 <html>
     <head>
         <title>Example</title>
-</head>
+    </head>
 <body>
-
         <?php
             // Import the fancy class
             require_once("scorcher.php");
@@ -16,7 +15,7 @@
             Scorcher::buildDatabase();
 
             // MAIN CLASS METHODS
-            $content = "../data/bob_2013_02_10.html";
+            $content = "../data/bob_2013_02_15.html";
             $directory = "../data/";
             // Oh yeah, instantiate the masterpiece. 
             $scorcher = new Scorcher();
@@ -29,7 +28,7 @@
             // See what's in the current object.
             $scorcher->displayVars();
             
-            //DATABASE METHODS
+            // DATABASE METHODS
             Scorcher::retrieveScores('bob');
             Scorcher::retrieveDateRange('2013_02_01','2013_03_01');
             Scorcher::retrieveHighest();
@@ -38,7 +37,5 @@
 
             // Let 'em know we're done for now.
             Scorcher::goodbyeWorld("...");
-
         ?>
-
 </body>

@@ -1,9 +1,18 @@
 <?php
 /**
- *
+ * Project Definition:
  * "Create a class in the langauge of your choice that will read HTML content input and
  * score and give an arbitrary score based on a set of rules."
+ * Author: Paul Prae 
+ * Purpose: Red Ventures Interview
+ * Last edited: July 14th, 2013
  *
+ * UNRESOLVED BUGS:
+ * 1. When I convert the document to a DOMDocument object, PHP adds in new tags.
+ *	This occures in the countTags() function when 'loadHTMLFile' is called.
+ *	'body' and 'html' tags will be added if they already do not exist.
+ * 	The function tries correcting the document if it does not meet certain standards:
+ *	http://stackoverflow.com/questions/4800459/php-domdocument-adds-extra-tags
  */
 class Scorcher
 	{	
@@ -36,6 +45,7 @@ class Scorcher
 		private $contentId; // String: ID for the content. Format: (keyname_yyyy_mm_dd)
 		private $contentPath; // String: URL or Directory Path to content
 		private $contentDirectory; // String: Parent directory of content
+		private $contentExtension; // String: To help determine file type.
 		private $keyname; // String: Unique content ID prefix. i.e. keyname from contentId Format: (keyname_yyyy_mm_dd)
 		private $contentDate; // Date content was published. i.e. yyyy_mm_dd keyname from contentId Format: (keyname_yyyy_mm_dd)
 		private $tagCountArray; // An array that will store tag names as keys and the instance count as the value
@@ -68,6 +78,7 @@ class Scorcher
 			$this->contentId = '';
 			$this->contentPath = '';
 			$this->keyname = '';
+			$this->contentExtension = '';
 			$this->contentDate = new DateTime();
 			$this->contentDirectory = '';
 			$this->tagCountArray = array();
@@ -88,24 +99,27 @@ class Scorcher
 		 */
 		public function scorch($path) {
 			$this->setPathVars($path);
-			$this->countTags();
-			// Get all of the keys from the rules array
-			$keyArray = array_keys($this->rulesArray);
-			for( $i = 0 ; $i < count($keyArray); $i++){
-				// If the tag for the rule exists in the content
-				if(array_key_exists($keyArray[$i], $this->tagCountArray)){
-					// Multiple the score modifier by the number of tag instances. Accumulate total score.
-					// 'Score of a tag' equals 'how often that tag occurs' multiplied by 'the score modifier for that tag'.
-					$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
-						($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
+			// Only process if it is an html file.
+			if(strcmp(strtolower($this->contentExtension), "html") == 0){
+				$this->countTags();
+				// Get all of the keys from the rules array
+				$keyArray = array_keys($this->rulesArray);
+				for( $i = 0 ; $i < count($keyArray); $i++){
+					// If the tag for the rule exists in the content
+					if(array_key_exists($keyArray[$i], $this->tagCountArray)){
+						// Multiple the score modifier by the number of tag instances. Accumulate total score.
+						// 'Score of a tag' equals 'how often that tag occurs' multiplied by 'the score modifier for that tag'.
+						$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
+							($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
+					}
 				}
-			}
-			$this->saveScorch();
+				$this->saveScorch();
+			}	else {echo "<b>Refusing to process</b> '$this->contentId.$this->contentExtension' due to potentially wrong file type.<br />\n";}
 		}
 		/**
 		 * 
 		 * Score all content in a directory. Map the rules to the amount of each tag. Multiply them by eachother.
-		 * NOTE: This will behave funny unless the content's name is formatted "format: (keyname_yyyy_mm_dd)"
+		 * 
 		 * @param string $directory Directory to the content that needs to be parsed. Format must include slash at the beginning and end.
 		 */
 		public function scorchDirectory($directory) {
@@ -127,6 +141,7 @@ class Scorcher
 			$this->contentPath = $path;
 			$this->contentDirectory = $pathParts['dirname'];
 			$this->contentId = $pathParts['filename'];
+			$this->contentExtension = $pathParts['extension'];
 			// Parse the contentId to extract the Unique ID and Content Published Date
 			$explosionArray = explode("_", $this->contentId);
 			$this->keyname = $explosionArray[0];
@@ -205,7 +220,7 @@ class Scorcher
 			}else { echo "MySQL connection successful.<br />\n"; }
 			$createDatabaseQuery = "CREATE DATABASE " . Scorcher::DB;//!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 			if (mysqli_query($localMysqli,$createDatabaseQuery)){
-				echo "Database " . Scorcher::DB . " created successfully.<br />\n";
+				echo "Database '" . Scorcher::DB . "' created successfully.<br />\n";
 			}else{
 				echo "Error creating database: " . mysqli_error($localMysqli) . "<br />\n";
 			}
@@ -232,7 +247,7 @@ class Scorcher
 					UNIQUE KEY run_id (run_id)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 			if (mysqli_query($localMysqli, $createTableQuery)){
-				echo "Table " . Scorcher::DBTABLE . " created successfully.<br />\n";
+				echo "Table '" . Scorcher::DBTABLE . "' created successfully.<br />\n";
 			}else{
 				echo "Error creating table: " . mysqli_error($localMysqli) . "<br />\n";
 			}
@@ -350,10 +365,11 @@ class Scorcher
 		 * Prints out the object's properties. 
 		 */
 		public function displayVars() {
-			echo "<br />\n";
+			echo "<br />\n<u>Current object properties</u><br />\n";
 			$this->displayVar("contentId", $this->contentId);
 			$this->displayVar("contentPath", $this->contentPath);
 			$this->displayVar("contentDirectory", $this->contentDirectory);
+			$this->displayVar("contentExtension", $this->contentExtension);
 			$this->displayVar("keyname", $this->keyname);
 			echo "<b>contentDate</b>"  .":	" . $this->contentDate->format('Y-m-d') . "<br />\n";
 			$this->displayVarray("tagCountArray", $this->tagCountArray);
