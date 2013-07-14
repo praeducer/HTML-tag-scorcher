@@ -7,7 +7,7 @@
  */
 class Scorcher
 	{	
-		// Configuraiton
+		// Configuration
  		private $DEFAULTRULESARRAY = array(
 			"div" => 3,
 			"p" => 1,
@@ -79,7 +79,7 @@ class Scorcher
 		 * 
 		 * Score content. Map the rules to the amount of each tag. Multiply them by eachother.
 		 * "Changes to the content can be re-ran over time to determine improvement/regression of the score."
-		 * "Accept HTML Content Input"
+		 * "Accept HTML Content Input" format: (keyname_yyyy_mm_dd.html)
 		 * "Score HTML content using the scoring guide"
 		 * "Each starting tag should been assigned a score."
 		 * "Each tag in the content should be added/subtracted to the total score."
@@ -95,6 +95,7 @@ class Scorcher
 				// If the tag for the rule exists in the content
 				if(array_key_exists($keyArray[$i], $this->tagCountArray)){
 					// Multiple the score modifier by the number of tag instances. Accumulate total score.
+					// 'Score of a tag' equals 'how often that tag occurs' multiplied by 'the score modifier for that tag'.
 					$this->totalScore += $this->scorecardArray[$keyArray[$i]] =
 						($this->tagCountArray[$keyArray[$i]] * $this->rulesArray[$keyArray[$i]]);		
 				}
@@ -104,7 +105,7 @@ class Scorcher
 		/**
 		 * 
 		 * Score all content in a directory. Map the rules to the amount of each tag. Multiply them by eachother.
-		 *
+		 * NOTE: This will behave funny unless the content's name is formatted "format: (keyname_yyyy_mm_dd)"
 		 * @param string $directory Directory to the content that needs to be parsed. Format must include slash at the beginning and end.
 		 */
 		public function scorchDirectory($directory) {
@@ -119,7 +120,7 @@ class Scorcher
 		/**
 		 * 
 		 * Break path into useful parts.
-		 *
+		 * "Contains the HTML content data to parse, format: (keyname_yyyy_mm_dd)"
 		 */
 		private function setPathVars($path) {
 			$pathParts = pathinfo($path);
@@ -130,7 +131,7 @@ class Scorcher
 			$explosionArray = explode("_", $this->contentId);
 			$this->keyname = $explosionArray[0];
 			$this->contentDate->setDate($explosionArray[1], $explosionArray[2], $explosionArray[3]);
-		}	
+		}
 		/**
 		 * 
 		 * Count how many times each tag is in the content. Store each tag count individually.
@@ -162,7 +163,24 @@ class Scorcher
 			$this->mysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
 			if (mysqli_connect_errno($this->mysqli)) {
 				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
-			}else { echo "MySQL connection successful.<br />\n"; }			
+			}else { echo "MySQL connection successful.<br />\n<br />\n"; }			
+		}
+		/**
+		 * 
+		 * Send a query to the database to be executed. Used on non-object methods.
+		 *
+		 * @param string $query The query to be ran in MySQL
+		 * @return array $result Result returned from MySQL connection after execution.
+		 */
+		private function executeQuery($query) {
+			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
+			if (mysqli_connect_errno($localMysqli)) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
+			}
+			$result = mysqli_query($localMysqli, $query);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			mysqli_close($localMysqli);
+			return $result;
 		}
 		/**
 		 * 
@@ -232,7 +250,7 @@ class Scorcher
 			if(!mysqli_query($this->mysqli, "INSERT INTO " . Scorcher::DBTABLE . " (keyname, content_date, score)
 				VALUES ('$this->keyname', '$contentDate', '$this->totalScore')")){
 				die('Error: ' . mysqli_error($this->mysqli) . "<br />\n");
-			} echo "New run added for '$this->contentId' with a score of '$this->totalScore'.<br />\n";
+			} echo "<b>New run added</b> for '$this->contentId' with a score of '$this->totalScore'.<br />\n";
 		}
 		/**
 		 * 
@@ -241,20 +259,14 @@ class Scorcher
 		 * @param string $key unqiue ID keyname for the content.
 		 */
 		public function retrieveScores($key) {
-			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
-			if (mysqli_connect_errno($localMysqli)) {
-				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
-			}
-			$result = mysqli_query($localMysqli,
-				"SELECT run_timestamp, content_date, score
+			$query =
+				"SELECT run_timestamp, keyname, content_date, score
 				FROM " . Scorcher::DBTABLE . "
 				WHERE keyname = '$key'
-				ORDER BY content_date ASC"
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
-			echo "'$key' content retrieved: <br />\n";
+				ORDER BY content_date ASC";
+			$result = Scorcher::executeQuery($query);
+			echo "<b>'$key' content retrieved:</b> <br />\n";
 			Scorcher::printRows($result);
-			mysqli_close($localMysqli);
 		}
 		/**
 		 * 
@@ -264,22 +276,16 @@ class Scorcher
 		 * @param string $end inclusive end date of range to be retrieved. Format MySQL DateTime
 		 */
 		public function retrieveDateRange($start, $end) {
-			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
-			if (mysqli_connect_errno($localMysqli)) {
-				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
-			}
-			$result = mysqli_query($localMysqli,
+			$query =
 				"SELECT run_timestamp, keyname, content_date, score
 				FROM " . Scorcher::DBTABLE . "
 				WHERE content_date
 				BETWEEN '$start'
 				AND '$end'
-				ORDER BY content_date ASC"
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
-			echo "Date range retrieved: <br />\n";
+				ORDER BY content_date ASC";
+			$result = Scorcher::executeQuery($query);
+			echo "<b>Date range retrieved:</b> <br />\n";
 			Scorcher::printRows($result);
-			mysqli_close($localMysqli);
 		}
 		/**
 		 * 
@@ -287,25 +293,19 @@ class Scorcher
 		 *
 		 */
 		public function retrieveHighest() {
-			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
-			if (mysqli_connect_errno($localMysqli)) {
-				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
-			}
-			$result = mysqli_query($localMysqli,
+			$query =
 				"SELECT MAX(score) AS max
-				FROM " . Scorcher::DBTABLE
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+				FROM " . Scorcher::DBTABLE;
+			$result = Scorcher::executeQuery($query);
 			$max = mysqli_fetch_array($result)['max'];
-			$result = mysqli_query($localMysqli,
+			$query =
 				"SELECT run_timestamp, keyname, content_date, score
 				FROM " . Scorcher::DBTABLE . "
-				WHERE score = $max"
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
-			echo "Highest scored Unique ID retrieved: <br />\n";
+				WHERE score = $max";
+			$result = Scorcher::executeQuery($query);
+			echo "<b>Highest scored Unique ID retrieved:</b> <br />\n";
 			Scorcher::printRows($result);
-			mysqli_close($localMysqli);
+
 		}
 		/**
 		 * 
@@ -313,25 +313,18 @@ class Scorcher
 		 *
 		 */
 		public function retrieveLowest() {
-			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
-			if (mysqli_connect_errno($localMysqli)) {
-				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
-			}
-			$result = mysqli_query($localMysqli,
+			$query =
 				"SELECT MIN(score) AS min
-				FROM " . Scorcher::DBTABLE
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+				FROM " . Scorcher::DBTABLE;
+			$result = Scorcher::executeQuery($query);
 			$min = mysqli_fetch_array($result)['min'];
-			$result = mysqli_query($localMysqli,
+			$query =
 				"SELECT run_timestamp, keyname, content_date, score
 				FROM " . Scorcher::DBTABLE . "
-				WHERE score = $min"
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
-			echo "Highest scored Unique ID retrieved: <br />\n";
+				WHERE score = $min";
+			$result = Scorcher::executeQuery($query);
+			echo "<b>Lowest scored Unique ID retrieved:</b> <br />\n";
 			Scorcher::printRows($result);
-			mysqli_close($localMysqli);
 		}
 		/**
 		 * 
@@ -340,22 +333,16 @@ class Scorcher
 		 *
 		 */
 		public function retrieveAvgPerKey() {
-			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
-			if (mysqli_connect_errno($localMysqli)) {
-				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
-			}
-			$result = mysqli_query($localMysqli,
+			$query =
 				"SELECT keyname, AVG(score)
 				FROM " . Scorcher::DBTABLE . "
-				GROUP BY keyname"
-			);
-			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
-			echo "Average scores across each key:<br />\n";
+				GROUP BY keyname";
+			$result = Scorcher::executeQuery($query);
+			echo "<b>Average scores across each key:</b> <br />\n";
 			while($row = mysqli_fetch_array($result)){
 				echo "\tThe average score of '". $row['keyname']. "' is '". round($row['AVG(score)'], 2) . "'.";
 				echo "<br />";
 			}
-			mysqli_close($localMysqli);
 		}
 
 		// Printers
@@ -373,6 +360,7 @@ class Scorcher
 			$this->displayVarray("rulesArray", $this->rulesArray);
 			$this->displayVarray("scorecardArray", $this->scorecardArray);
 			$this->displayVar("totalScore", $this->totalScore);
+			echo "<br />\n";
 		}
 
 		private function displayVar($name, $var){
