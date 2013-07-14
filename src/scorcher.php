@@ -247,6 +247,37 @@ class Scorcher
 			mysqli_close($localMysqli);
 		}
 
+		/**
+		 * 
+		 * "Method: Retrieve all scores run in the system for a custom date range"
+		 *
+		 * @param string $start inclusive start date of range to be retrieved. Format MySQL DateTime
+		 * @param string $end inclusive end date of range to be retrieved. Format MySQL DateTime
+		 */
+		public function retrieveDateRange($start, $end) {
+			$localMysqli = mysqli_connect(Scorcher::DBSERVER, Scorcher::DBUSER, Scorcher::DBPASS, Scorcher::DB);
+			if (mysqli_connect_errno($localMysqli)) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error() . "<br />\n";
+			}
+			$result = mysqli_query($localMysqli,
+				"SELECT run_timestamp, keyname, content_date, score
+				FROM " . Scorcher::DBTABLE . "
+				WHERE content_date
+				BETWEEN '$start'
+				AND '$end'
+				ORDER BY content_date ASC"
+			);
+			if(!$result){ die('Error: ' . mysqli_error($localMysqli) . "<br />\n"); }
+			echo "Date range retrieved: <br />\n";
+			while($row = mysqli_fetch_array($result)) {
+				echo "\tOn " . $row['content_date'] . " the keyname '" . $row['keyname'] . "' scored '" . $row['score'] .
+					"' according to the run with a timestamp of '" . $row['run_timestamp'] . "'.<br />\n";
+			}
+			mysqli_close($localMysqli);
+		}
+
+
+
 		// Printers
 		/**
 		 * Prints out the object's properties. 

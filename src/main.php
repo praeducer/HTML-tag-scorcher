@@ -15,7 +15,7 @@
             //Scorcher::buildDatabase();
 
             // MAIN CLASS METHODS
-            //$content = "../data/paul_1986_02_03.html";
+            //$content = "../data/bob_2013_03_01.html";
             //$directory = "../data/";
             // Oh yeah, instantiate the masterpiece. 
             //$scorcher = new Scorcher();
@@ -27,8 +27,8 @@
             //$scorcher->displayVars();
             
             //DATABASE METHODS
-            Scorcher::retrieveScores('bob');
-
+            //Scorcher::retrieveScores('bob');
+            Scorcher::retrieveDateRange('2013_02_01','2013_03_01');
             // Let 'em know we're done for now.
             Scorcher::goodbyeWorld("...");
 
