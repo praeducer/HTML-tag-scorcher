@@ -1,14 +1,12 @@
 MarkupProject
 =============
 
-Info
-----
-Create a class in the langauge of your choice that will read HTML content input and score and give 
-an arbitrary score based on a set of rules. The content should be assigned a unique id based on the prefix described below. 
-Changes to the content can be re-ran over time to determine improvement/regression of the score. Each unique run should be stored with the
-date and time it was ran along with the score received for the content.
+Assignment
+-----------
+Create a class in the language of your choice that will read HTML content and score it based on a set of rules. The content should be assigned a unique id based on the prefix described below. 
+Changes to the content can be re-ran over time to determine improvement/regression of the score. Each unique run should be stored with the date and time it was ran along with the score received for the content.
 
-You can use external libraries if you feel they will aid you but you must place them in the appropiate folder based on the project layout section.
+You can use external libraries if you feel they will aid you but you must place them in the appropriate folder based on the project layout section.
 
 Code Requirements
 -----------------
@@ -23,14 +21,14 @@ Code Requirements
 * Additionally you should write one query that will find the average score for all runs **__see project layout below__**
 
 ## Bonus
-* tag names are case-insensitive (ie: Html is the same as html)
+* tag names are case-insensitive (ie: HTML is the same as html)
 * Parse multiple sections of the HTML content at the same time for performance
 
 Scoring Rules
 -------------
-Each starting tag should below has been assigned a score. Each tag in the content should be added/subtracted to the total score.
+Each starting tag shown below has been assigned a score. Each tag in the content should be added/subtracted to the total score.
 
-(We will assume for this project our html code creator created valid html)
+(We will assume for this project our HTML code creator created valid HTML)
 
 | TagName | Score Modifier | TagName | Score Modifier |
 | ------- | :------------: | ------- | -------------- |
@@ -94,12 +92,12 @@ bobs  | 8.03
 
 ####/vendor
 
-* If you didn't write it put it in here and are using it put it in here.
+* If you didn't write it put it in here.
 
 Instructions
 ------------
-* Fork this repo into your own github account.  
-* Begin working on the project and commit your code to the repo
-* When you are finished. Email your RedVentures recruiter or submit a pull request on the project. 
+* Fork this repo into your own GitHub account.  
+* Begin working on the project and commit your code to the repo.
+* When you are finished, email your Red Ventures' recruiter or submit a pull request on the project. 
 
 
